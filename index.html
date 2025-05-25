@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<!-- Equine 🐴📝 - Vibe coded in Florida, Summer 2025 -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equine 🐴📝</title>
+    <script src="fixi.js"></script>
+    <script src="_hyperscript.js"></script>
+    <style>
+        body {
+            font-family: Monaco, Consolas, monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .highlight { background-color: #fffacd; }
+        .active { background-color: #4caf50; color: white; }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .panels {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .panel {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        #input-area {
+            width: 100%;
+            min-height: 200px;
+            font-family: inherit;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            white-space: pre;
+            box-sizing: border-box;
+        }
+        
+        #output-panel {
+            min-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: transparent;
+            box-sizing: border-box;
+        }
+        
+        #error-panel {
+            margin-top: 0.5rem;
+            color: #d32f2f;
+            display: none;
+            border-left: 3px solid #d32f2f;
+            padding-left: 0.5rem;
+        }
+        
+        .controls { margin: 0.8rem 0; display: flex; gap: 8px; }
+        
+        button {
+            padding: 6px 12px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .example-menu { display: flex; gap: 8px; flex-wrap: wrap; margin: 1rem 0; }
+        
+        .example-button {
+            cursor: pointer;
+            padding: 4px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        a { color: #333; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Equine 🐴📝</h1>
+        </header>
+        
+
+        <div class="panels">
+            <div class="panel">
+                <textarea id="input-area" placeholder="Enter HTML with Fixi.js or Hyperscript attributes here..."><div>Hello Fixi.js & Hyperscript</div></textarea>
+                <div class="controls">
+                    <button id="render-btn">Render</button>
+                    <button id="clear-btn">Clear</button>
+                    <button id="share-btn">Share</button>
+                </div>
+                <div class="example-menu">
+                    <span class="example-button" data-example="example-1">Fixi Basic</span>
+                    <span class="example-button" data-example="example-2">Fixi Target</span>
+                    <span class="example-button" data-example="example-3">Fixi Swap</span>
+                    <span class="example-button" data-example="example-4">_hs Click</span>
+                    <span class="example-button" data-example="example-5">_hs Toggle</span>
+                    <span class="example-button" data-example="example-6">_hs Fetch</span>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div id="output-panel"></div>
+                <div id="error-panel"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Example templates
+        const examples = {
+            "example-1": `<div fx-action="/api/hello" fx-method="get">
+  Click me to load content from /api/hello
+</div>`,
+            "example-2": `<div fx-action="/api/content" fx-trigger="click" fx-target="#output-panel">
+  Click me to load content into the output panel
+</div>`,
+            "example-3": `<div fx-action="/api/swap" fx-method="get" fx-swap="innerHTML">
+  Click me to replace my inner content
+</div>`,
+            "example-4": `<div _="on click log 'Clicked!' then add .highlight">
+  Click me to see console log and highlight
+</div>`,
+            "example-5": `<div _="on click toggle .active">
+  Click me to toggle the active class
+</div>`,
+            "example-6": `<div _="on click fetch '/api/hello' then put it into #output-panel">
+  Click me to fetch data with hyperscript
+</div>`
+        };
+        
+        // Render content to output panel
+        function renderContent() {
+            const input = document.getElementById('input-area').value.trim();
+            const output = document.getElementById('output-panel');
+            const errorPanel = document.getElementById('error-panel');
+            
+            errorPanel.style.display = 'none';
+            errorPanel.textContent = '';
+            
+            if (input) {
+                try {
+                    output.innerHTML = input;
+                    if (window._hyperscript) {
+                        window._hyperscript.processNode(output);
+                    }
+                } catch (e) {
+                    errorPanel.style.display = 'block';
+                    errorPanel.textContent = e.message;
+                }
+            } else {
+                output.innerHTML = '<p style="color: gray;">Enter HTML in the input panel</p>';
+            }
+        }
+        
+        // Setup event listeners
+        document.getElementById('render-btn').addEventListener('click', renderContent);
+        
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.getElementById('input-area').value = '<div>Hello Fixi.js & Hyperscript</div>';
+            document.getElementById('output-panel').innerHTML = '';
+        });
+        
+        document.getElementById('share-btn').addEventListener('click', () => {
+            const content = document.getElementById('input-area').value;
+            const encoded = btoa(encodeURIComponent(content));
+            const url = `${window.location.origin}${window.location.pathname}?code=${encoded}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this URL:', url);
+            });
+        });
+        
+        // Example buttons
+        document.querySelectorAll('.example-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const exampleId = button.getAttribute('data-example');
+                document.getElementById('input-area').value = examples[exampleId];
+                setTimeout(renderContent, 100);
+            });
+        });
+        
+        // Add mock templates
+        document.body.insertAdjacentHTML('beforeend', `
+            <template id="/api/hello"><div>Hello from the API!</div></template>
+            <template id="/api/content"><div>Content loaded from API</div></template>
+            <template id="/api/swap"><div>Content has been swapped</div></template>
+        `);
+        
+        // Setup mocks
+        document.addEventListener("fx:config", (evt) => {
+            const template = document.getElementById(evt.detail.cfg.action);
+            if (template) {
+                evt.detail.cfg.fetch = () => ({ text: () => template.innerHTML });
+            }
+        });
+        
+        // Mock fetch for Hyperscript
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            const template = document.getElementById(url);
+            if (template) {
+                return Promise.resolve({
+                    text: () => Promise.resolve(template.innerHTML),
+                    json: () => Promise.resolve(JSON.parse(template.innerHTML))
+                });
+            }
+            return originalFetch(url, options);
+        };
+        
+        // Load from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('code')) {
+            try {
+                document.getElementById('input-area').value = decodeURIComponent(atob(urlParams.get('code')));
+                renderContent();
+            } catch (e) {}
+        }
+    </script>
+
+    
+    <footer>
+        <p><a href="https://github.com/bigskysoftware/fixi">Fixi.js</a> | <a href="https://hyperscript.org">Hyperscript</a> | Florida '25</p>
+    </footer>
+</body>
+</html>
